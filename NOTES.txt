@@ -1,0 +1,37 @@
+tabel: orders
+id int
+status (varchar 32)
+created_at
+updated_at
+
+tabel: order_item
+order_id (int) (PK orders -> id)
+item_id (PK items -> id)
+quantity
+
+tabel: items
+id      (char 16)
+nama    (varchar)
+harga   double(10, 2)
+stok    int
+created_at
+updated_at
+
+created_at
+updated_at
+
+Ketentuan
+- ID Order auto increment
+- Status hanya ada 2 "Selesai" dan "Menunggu Pembayaran"
+- quantity tidak boleh kurang dari 1
+- id item 16 digit angka
+- harga item tidak boleh kurang dari 0
+- stok item tidak boleh kutang dari 0
+
+---------------------------------------------------------------------
+
+Buat web route sebagai berikut:
+a. / -> function Index AppController menampilkan view Index
+b. /items -> resource controller ItemController
+b. /order -> function order OrderController untuk menampilkan view order
+c. /order -> function createOrder OrderController untuk menjalankan fungsi pembuatan pesanan item
