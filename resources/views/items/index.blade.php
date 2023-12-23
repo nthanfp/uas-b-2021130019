@@ -7,17 +7,35 @@
         <div class="card text-white mb-3">
             <div class="card-header bg-success"><i class="fa fa-list"></i> List Items </div>
             <div class="card-body">
+
+                @if (session('success'))
+                    <div class="alert alert-success" role="alert">
+                        {{ session('success') }}
+                    </div>
+                @endif
+
+                @if ($errors->any())
+                    <div class="alert alert-danger">
+                        <ul>
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
                 <div class="col-md-12">
-                    <a href="{{ route('items.create') }}" class="btn btn-success mb-2"><i class="fa fa-plus"></i> Add Item</a>
+                    <a href="{{ route('items.create') }}" class="btn btn-success mb-2"><i class="fa fa-plus"></i> Add
+                        Item</a>
                     <div class="table-responsive">
                         <table class="table table-bordered">
                             <thead>
                                 <tr>
-                                    <th>ID</th>
-                                    <th>Nama</th>
-                                    <th>Harga</th>
-                                    <th>Stok</th>
-                                    <th>Aksi</th>
+                                    <th>Item ID</th>
+                                    <th>Name</th>
+                                    <th>Price</th>
+                                    <th>Stock</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
