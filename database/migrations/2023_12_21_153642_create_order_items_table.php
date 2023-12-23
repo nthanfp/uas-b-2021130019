@@ -8,10 +8,11 @@ class CreateOrderItemsTable extends Migration
 {
     public function up()
     {
-        Schema::create('order_item', function (Blueprint $table) {
+        Schema::create('order_items', function (Blueprint $table) {
             $table->foreignId('order_id')->constrained();
             $table->char('item_id', 16);
             $table->integer('quantity')->unsigned();
+            $table->timestamps();
             $table->primary(['order_id', 'item_id']);
         });
     }
