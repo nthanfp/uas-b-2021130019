@@ -4,32 +4,20 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
+class CreateOrderItemsTable extends Migration
 {
-    /**
-     * Run the migrations.
-     */
-    public function up(): void
+    public function up()
     {
-        Schema::create('order_items', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->unsignedBigInteger('order_id');
-            $table->unsignedBigInteger('item_id');
+        Schema::create('order_item', function (Blueprint $table) {
+            $table->foreignId('order_id')->constrained();
+            $table->char('item_id', 16);
             $table->integer('quantity')->unsigned();
-            $table->timestamps();
-
-            $table->foreign('order_id')->references('id')->on('orders')->onDelete('cascade');
-            $table->foreign('item_id')->references('id')->on('items')->onDelete('cascade');
+            $table->primary(['order_id', 'item_id']);
         });
-
-        $this->execute('ALTER TABLE order_items ADD CONSTRAINT quantity_check CHECK (quantity >= 1);');
     }
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
+    public function down()
     {
-        Schema::dropIfExists('order_items');
+        Schema::dropIfExists('order_item');
     }
-};
+}
