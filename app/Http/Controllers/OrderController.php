@@ -15,18 +15,10 @@ class OrderController extends Controller
      */
     public function index()
     {
-        $availableItems = Item::all(); // Ambil semua item yang tersedia
+        $availableItems = Item::where('stok', '>', 1)->get(); // Ambil semua item yang tersedia
         $itemStocks = Item::all(); // Ambil semua item yang tersedia
 
         return view('orders.index', compact('availableItems', 'itemStocks'));
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
     }
 
     /**
@@ -99,6 +91,14 @@ class OrderController extends Controller
             // Handle the exception, log it, or return an error response
             return redirect()->back()->with('error', 'An error occurred while processing the order.');
         }
+    }
+
+    /**
+     * Display all resource.
+     */
+    public function list(Order $order)
+    {
+        //
     }
 
     /**

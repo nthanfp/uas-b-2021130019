@@ -37,32 +37,22 @@
                         @csrf
 
                         <div class="form-group mb-3">
-                            <label for="status">Status</label>
+                            <label for="status">Status <span class="text-danger">*</span></label>
                             <select name="status" id="status" class="form-control">
+                                <option value="">-- Choose Status --</option>
                                 <option value="Menunggu Pembayaran">Menunggu Pembayaran</option>
                                 <option value="Selesai">Selesai</option>
                             </select>
                         </div>
 
-                        <div id="cartElement"></div>
+                        <div id="cartElement" class="mb-3">
+                            <!-- Add more form fields as needed -->
+                        </div>
 
-                        {{-- <div class="form-group row mb-2" id="elemen">
-                            <div class="col-md-6">
-                                <input type="text" name="items[]" id="items" class="form-control" placeholder="Item"
-                                    required>
-                            </div>
-                            <div class="col-md-3">
-                                <input type="number" name="quantities[]" id="quantities" class="form-control"
-                                    placeholder="Enter quantity" required>
-                            </div>
-                            <div class="col-md-3 float-end">
-                                <button type="button" class="btn btn-danger" id="_remove">
-                                    Remove
-                                </button>
-                            </div>
-                        </div> --}}
-
-                        <!-- Add more form fields as needed -->
+                        <div id="totalPriceContainer" class="mb-3">
+                            <label>Total Price (incl. PPN 11%)</label>
+                            <input type="text" id="totalPrice" class="form-control" readonly>
+                        </div>
 
                         <button type="submit" class="btn btn-success">Submit Order</button>
                     </form>
@@ -108,9 +98,30 @@
         $(document).ready(function() {
             let cartItemIdCounter = 0;
 
-            $("#addToCartBtn").on("click", function() {
-                alert('OK!');
-                alert($(this).attr('data-item-id'));
+            function updateTotalPrice() {
+                let totalPrice = 0;
+
+                // Loop through all cart items and calculate the total price
+                $(".btn-add-to-cart").each(function() {
+                    const itemId = $(this).attr('data-item-id');
+                    const itemPrice = parseFloat($(this).attr('data-item-price'));
+                    const itemQuantity = parseInt($("#quantities_cartItem_" + itemId).val());
+
+                    totalPrice += itemPrice * itemQuantity;
+                });
+
+                // Apply PPN (11%)
+                const ppnRate = 0.11;
+                const ppn = totalPrice * ppnRate;
+                totalPrice += ppn;
+
+                // Update the total price input field
+                $("#totalPrice").val(totalPrice.toFixed(2));
+            }
+
+            $(".btn-add-to-cart").on("click", function() {
+                // alert('OK!');
+                // alert($(this).attr('data-item-id'));
 
                 const itemName = $(this).attr('data-item-name');
                 const itemId = $(this).attr('data-item-id');
@@ -120,9 +131,12 @@
                 // if (itemName && itemQuantity) {
                 const cartItemId = `cartItem_${itemId}`;
                 const cartItemRow = `
+                        <div class="col-md-6">
+                            <input type="text" name="items[]" class="form-control" value="${itemId}" readonly hidden>
+                        </div>
                         <div class="row mb-2" id="${cartItemId}">
                             <div class="col-md-6">
-                                <input type="text" name="items[]" class="form-control" value="${itemId}" readonly>
+                                <input type="text" class="form-control" value="${itemName}" readonly>
                             </div>
                             <div class="col-md-3">
                                 <input type="number" id="quantities_${cartItemId}" name="quantities[]" class="form-control" value="${itemQuantity}" readonly>
@@ -136,19 +150,25 @@
                     `;
 
                 if ($('#' + cartItemId).length) {
-                    alert('ADA!');
+                    // alert('ADA!');
                     var xquantities = $('#quantities_' + cartItemId).val();
-                    $('#quantities_' + cartItemId).val(xquantities + 1);
+                    $('#quantities_' + cartItemId).val(parseInt(xquantities) + 1);
                 } else {
-                    alert('TIMPA');
+                    // alert('TIMPA');
                     $("#cartElement").html(cartItemRow + '' + itemsCart);
                 }
                 // }
+
+                // Update the total price whenever a new item is added to the cart
+                updateTotalPrice();
             });
 
             $("#OrderForm").on("click", ".btn-remove-cart-item", function() {
                 const targetId = $(this).data("target");
                 $("#" + targetId).remove();
+
+                // Update the total price whenever an item is removed from the cart
+                updateTotalPrice();
             });
         });
     </script>
