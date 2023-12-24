@@ -15,7 +15,14 @@
                         </div>
                     @endif
 
+                    @if (session('error'))
+                        <div class="alert alert-danger">
+                            {{ session('error') }}
+                        </div>
+                    @endif
+
                     @if ($errors->any())
+                        {{ dd($errors) }}
                         <div class="alert alert-danger">
                             <ul>
                                 @foreach ($errors->all() as $error)
@@ -25,10 +32,11 @@
                         </div>
                     @endif
 
+
                     <form action="{{ route('orders.store') }}" method="POST" id="newOrderForm">
                         @csrf
 
-                        <div class="form-group">
+                        <div class="form-group mb-3">
                             <label for="status">Status</label>
                             <select name="status" id="status" class="form-control">
                                 <option value="Menunggu Pembayaran">Menunggu Pembayaran</option>
@@ -36,19 +44,25 @@
                             </select>
                         </div>
 
-                        <div class="form-group">
-                            <label for="items">Select Items</label>
-                            <select name="items[]" id="items" class="form-control" multiple>
-                                @foreach ($availableItems as $item)
-                                    <option value="{{ $item->id }}">{{ $item->nama }} - Stok {{ $item->stok }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
+                        <div id="cartElement"></div>
 
-                        <div class="form-group" id="cartItems">
-                            <!-- Cart items will be dynamically added here -->
-                        </div>
+                        {{-- <div class="form-group row mb-2" id="elemen">
+                            <div class="col-md-6">
+                                <input type="text" name="items[]" id="items" class="form-control" placeholder="Item"
+                                    required>
+                            </div>
+                            <div class="col-md-3">
+                                <input type="number" name="quantities[]" id="quantities" class="form-control"
+                                    placeholder="Enter quantity" required>
+                            </div>
+                            <div class="col-md-3 float-end">
+                                <button type="button" class="btn btn-danger" id="_remove">
+                                    Remove
+                                </button>
+                            </div>
+                        </div> --}}
+
+                        <!-- Add more form fields as needed -->
 
                         <button type="submit" class="btn btn-success">Submit Order</button>
                     </form>
@@ -75,7 +89,7 @@
                                     <td>{{ $item->stok }}</td>
                                     <td>{{ $item->harga }}</td>
                                     <td>
-                                        <button type="button" class="btn btn-success btn-add-to-cart"
+                                        <button type="button" id="addToCartBtn" class="btn btn-success btn-add-to-cart"
                                             data-item-id="{{ $item->id }}" data-item-name="{{ $item->nama }}"
                                             data-item-price="{{ $item->harga }}">
                                             Add to Cart
@@ -92,51 +106,47 @@
 
     <script type="module">
         $(document).ready(function() {
-            // Counter for unique cart item IDs
             let cartItemIdCounter = 0;
 
-            // Function to add a new cart item row
-            function addCartItemRow(itemId, itemName, itemPrice) {
-                const cartItemsContainer = $("#cartItems");
-                const cartItemId = `cartItem_${cartItemIdCounter++}`;
+            $("#addToCartBtn").on("click", function() {
+                alert('OK!');
+                alert($(this).attr('data-item-id'));
 
+                const itemName = $(this).attr('data-item-name');
+                const itemId = $(this).attr('data-item-id');
+                const itemQuantity = 1;
+                const itemsCart = $("#cartElement").html();
+
+                // if (itemName && itemQuantity) {
+                const cartItemId = `cartItem_${itemId}`;
                 const cartItemRow = `
-                    <div class="row mb-2" id="${cartItemId}">
-                        <div class="col-md-6">
-                            <input type="hidden" name="cart_items[${cartItemId}][item_id]" value="${itemId}">
-                            <label>${itemName}</label>
+                        <div class="row mb-2" id="${cartItemId}">
+                            <div class="col-md-6">
+                                <input type="text" name="items[]" class="form-control" value="${itemId}" readonly>
+                            </div>
+                            <div class="col-md-3">
+                                <input type="number" id="quantities_${cartItemId}" name="quantities[]" class="form-control" value="${itemQuantity}" readonly>
+                            </div>
+                            <div class="col-md-3 float-end">
+                                <button type="button" class="btn btn-danger btn-remove-cart-item" data-target="${cartItemId}">
+                                    Remove
+                                </button>
+                            </div>
                         </div>
-                        <div class="col-md-3">
-                            <label>Quantity</label>
-                            <input type="number" name="cart_items[${cartItemId}][quantity]" class="form-control" required>
-                        </div>
-                        <div class="col-md-3">
-                            <label>Price</label>
-                            <input type="text" class="form-control" value="${itemPrice}" readonly>
-                        </div>
-                        <div class="col-md-12">
-                            <button type="button" class="btn btn-danger btn-remove-cart-item" data-target="${cartItemId}">
-                                Remove
-                            </button>
-                        </div>
-                    </div>
-                `;
+                    `;
 
-                cartItemsContainer.append(cartItemRow);
-            }
-
-            // Function to handle the "Add to Cart" button click
-            $(".btn-add-to-cart").on("click", function() {
-                const itemId = $(this).data("item-id");
-                const itemName = $(this).data("item-name");
-                const itemPrice = $(this).data("item-price");
-
-                // Add the item to the cart
-                addCartItemRow(itemId, itemName, itemPrice);
+                if ($('#' + cartItemId).length) {
+                    alert('ADA!');
+                    var xquantities = $('#quantities_' + cartItemId).val();
+                    $('#quantities_' + cartItemId).val(xquantities + 1);
+                } else {
+                    alert('TIMPA');
+                    $("#cartElement").html(cartItemRow + '' + itemsCart);
+                }
+                // }
             });
 
-            // Function to handle the "Remove" button click for cart items
-            $("#cartItems").on("click", ".btn-remove-cart-item", function() {
+            $("#OrderForm").on("click", ".btn-remove-cart-item", function() {
                 const targetId = $(this).data("target");
                 $("#" + targetId).remove();
             });

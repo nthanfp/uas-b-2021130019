@@ -35,6 +35,9 @@ class OrderController extends Controller
     public function store(Request $request)
     {
         try {
+
+            // dd($request);
+
             // Start the database transaction
             DB::beginTransaction();
 
@@ -91,7 +94,7 @@ class OrderController extends Controller
 
             // Log the exception for debugging purposes
             \Log::error($e);
-            dd($e->getMessage());
+            // dd($e->getMessage());
 
             // Handle the exception, log it, or return an error response
             return redirect()->back()->with('error', 'An error occurred while processing the order.');
